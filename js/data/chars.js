@@ -20,3 +20,5 @@ const CHARS={
   wep:'familiar',hp:105,sp:215,dmg:10,sg:1,
   skill:{id:'legion',n:'レギオン',d:'10秒間、使い魔を4体追加し、攻撃も速くなる'}},
 };
+
+for(const k in CHARS)CHARS[k].id=k;

@@ -16,19 +16,24 @@ const WEP={
   lv:l=>`範囲${110+8*l} ・ 威力${150+30*(l-1)}%${l>=4?' ・ 後ろも斬る':''}`,
   tick(p,w,dt){if(!cool(w,dt))return;w.t=pCD(p,Math.max(.3,.6-.03*w.lv));const R=(110+8*w.lv)*p.area,t=nearestE(p.x,p.y,R+140);
    const a=t?Math.atan2(t.y-p.y,t.x-p.x):Math.atan2(p.diry,p.dirx),half=1.1+.04*w.lv,dirs=w.lv>=4?[a,a+Math.PI]:[a];
-   for(const da of dirs){hitSector(p.x,p.y,R,da,half,pD(p)*(1.5+.3*(w.lv-1)),260);G.fx.push({k:'arc',x:p.x,y:p.y,r:R,a:da,w:half,life:.18,max:.18,c:'#ffd08a'})}}},
+   for(const da of dirs){hitSector(p.x,p.y,R,da,half,pD(p)*(1.5+.3*(w.lv-1)),260);G.fx.push({k:'arc',x:p.x,y:p.y,r:R,a:da,w:half,life:.26,max:.26,c:'#ffa84a'});sparks(p.x+Math.cos(da)*R*.8,p.y+Math.sin(da)*R*.8,'#ffe0a0',6,da,.8)}}},
  shield:{n:'ガーディアン',c:'#c8d8ff',ic:'盾',main:1,max:8,d:'自分の周りを盾が回り、敵を弾き飛ばす',
   lv:l=>`${2+Math.floor((l-1)/2)}枚 ・ 威力${90+25*(l-1)}%`,
   tick(p,w,dt){w.a+=dt*3.4;const n=2+Math.floor((w.lv-1)/2),R=(82+3*w.lv)*p.area,dmg=pD(p)*(.9+.25*(w.lv-1));
    for(let i=0;i<n;i++){const a=w.a+i/n*TAU;hitCircleCD(p.x+Math.cos(a)*R,p.y+Math.sin(a)*R,(18+w.lv)*p.area,dmg,340,'sh',.35)}},
   draw(p,w){const n=2+Math.floor((w.lv-1)/2),R=(82+3*w.lv)*p.area,s=(18+w.lv)*p.area;
-   for(let i=0;i<n;i++){const a=w.a+i/n*TAU,x=p.x+Math.cos(a)*R,y=p.y+Math.sin(a)*R;ctx.save();ctx.translate(x,y);ctx.rotate(a+Math.PI/2);
-    ctx.fillStyle='#ffffff30';ctx.beginPath();ctx.arc(0,0,s+4,0,TAU);ctx.fill();
-    ctx.fillStyle='#0b0b14';ctx.fillRect(-s*.7-2,-s-2,s*1.4+4,s*1.8+4);ctx.fillStyle='#c8d8ff';ctx.fillRect(-s*.7,-s,s*1.4,s*1.8);ctx.fillStyle='#5a7ad8';ctx.fillRect(-s*.15,-s*.8,s*.3,s*1.4);ctx.restore()}}},
+   additive(true);ctx.globalAlpha=.18;ctx.strokeStyle='#c8d8ff';ctx.lineWidth=2;ctx.beginPath();ctx.arc(p.x,p.y,R,0,TAU);ctx.stroke();additive(false);
+   for(let i=0;i<n;i++){const a=w.a+i/n*TAU,x=p.x+Math.cos(a)*R,y=p.y+Math.sin(a)*R;
+    additive(true);for(let k=1;k<=5;k++){const a2=a-k*.1;glow(p.x+Math.cos(a2)*R,p.y+Math.sin(a2)*R,s*(1.1-k*.12),'#8ab0ff',.45-k*.07)}glow(x,y,s*2.2,'#c8d8ff',.6);additive(false);
+    ctx.save();ctx.translate(x,y);ctx.rotate(a+Math.PI/2);ctx.globalAlpha=1;
+    ctx.fillStyle='#0b0b14';ctx.beginPath();ctx.moveTo(-s*.85,-s*.7);ctx.lineTo(s*.85,-s*.7);ctx.lineTo(s*.85,s*.3);ctx.lineTo(0,s*1.15);ctx.lineTo(-s*.85,s*.3);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#4a78ff';ctx.beginPath();ctx.moveTo(-s*.7,-s*.58);ctx.lineTo(s*.7,-s*.58);ctx.lineTo(s*.7,s*.25);ctx.lineTo(0,s*.98);ctx.lineTo(-s*.7,s*.25);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#bcd4ff';ctx.beginPath();ctx.moveTo(-s*.7,-s*.58);ctx.lineTo(0,-s*.58);ctx.lineTo(0,s*.98);ctx.lineTo(-s*.7,s*.25);ctx.closePath();ctx.fill();
+    ctx.fillStyle='#ffd84a';ctx.fillRect(-s*.12,-s*.45,s*.24,s*1.0);ctx.fillRect(-s*.4,-s*.1,s*.8,s*.24);ctx.restore()}}},
  snipe:{n:'スナイプレーザー',c:'#5ce0ff',ic:'狙',main:1,max:8,d:'画面の端まで届く貫通レーザーで強い敵を狙う',
-  lv:l=>`射程1100 ・ 威力${230+45*(l-1)}%${l>=5?' ・ 2本':''}`,
+  lv:l=>`射程1100 ・ 威力${230+45*(l-1)}%${l>=3?' ・ '+(1+(l>=3)+(l>=6))+'本':''}`,
   tick(p,w,dt){if(!cool(w,dt))return;const cs=G.en.filter(e=>!e.dead&&d2(p.x,p.y,e.x,e.y)<1100*1100).sort((a,b)=>b.hp-a.hp);
-   if(!cs.length){w.t=.05;return}w.t=pCD(p,Math.max(.55,1.2-.07*w.lv));const n=w.lv>=5?2:1;
+   if(!cs.length){w.t=.05;return}w.t=pCD(p,Math.max(.45,.9-.05*w.lv));const n=1+(w.lv>=3?1:0)+(w.lv>=6?1:0)+(w.lv>=11?1:0);
    for(let i=0;i<n&&i<cs.length;i++){const t=cs[i],a=Math.atan2(t.y-p.y,t.x-p.x);beam(p.x,p.y-6,a,1150,(10+2*w.lv)*p.area,pD(p)*(2.3+.45*(w.lv-1)),'#5ce0ff')}}},
  chain:{n:'チェインボルト',c:'#ffe45a',ic:'雷',main:1,max:8,d:'雷が敵から敵へ次々と連鎖する',
   lv:l=>`連鎖${3+Math.floor(l/2)}体 ・ 威力${115+28*(l-1)}%`,
@@ -42,7 +47,11 @@ const WEP={
    const cd=pCD(p,Math.max(.45,1.05-.06*w.lv))*(leg?.55:1);
    for(let i=0;i<n;i++){const f=w.fs[i],a=w.a+i/n*TAU;f.x=p.x+Math.cos(a)*(leg?75:55);f.y=p.y-14+Math.sin(a)*(leg?45:32);f.t-=dt;
     if(f.t<=0){const t=nearestE(f.x,f.y,650);if(t){f.t=cd;addP({x:f.x,y:f.y,a:Math.atan2(t.y-f.y,t.x-f.x)+rand(-.4,.4),sp:430,r:7,dmg:pD(p)*(1+.25*(w.lv-1)),col:'#9aff7a',kind:'homing',life:1.6,kb:40})}else f.t=.1}}},
-  draw(p,w){if(!w.fs)return;for(const f of w.fs){ctx.fillStyle='#9aff7a40';ctx.beginPath();ctx.arc(f.x,f.y,13,0,TAU);ctx.fill();ctx.fillStyle='#0b0b14';ctx.fillRect(f.x-8,f.y-8,16,16);ctx.fillStyle='#9aff7a';ctx.fillRect(f.x-6,f.y-6,12,12);ctx.fillStyle='#0b0b14';ctx.fillRect(f.x-3,f.y-3,2,3);ctx.fillRect(f.x+1,f.y-3,2,3)}}},
+  draw(p,w){if(!w.fs)return;for(const f of w.fs){const t=G.anim*8+f.x*.01,by=Math.sin(t)*3;
+   additive(true);glow(f.x,f.y+by,32,'#7aff9a',.7);additive(false);ctx.globalAlpha=1;
+   ctx.fillStyle='#0b0b14';ctx.beginPath();ctx.arc(f.x,f.y+by,11,0,TAU);ctx.fill();ctx.fillStyle='#9aff7a';ctx.beginPath();ctx.arc(f.x,f.y+by,9,0,TAU);ctx.fill();ctx.fillStyle='#d8ffc8';ctx.beginPath();ctx.arc(f.x-2,f.y+by-3,4.5,0,TAU);ctx.fill();
+   ctx.fillStyle='#0b0b14';ctx.fillRect(f.x-5,f.y+by-1,3,4);ctx.fillRect(f.x+2,f.y+by-1,3,4);
+   const wf=Math.sin(t*2)*4;ctx.fillStyle='#e8fff0cc';ctx.beginPath();ctx.ellipse(f.x-13,f.y+by-5,8,4+wf*.3,-.5,0,TAU);ctx.fill();ctx.beginPath();ctx.ellipse(f.x+13,f.y+by-5,8,4+wf*.3,.5,0,TAU);ctx.fill()}}},
 
  // ---------- 共通（レベルアップで入手） ----------
  knife:{n:'ナイフ',c:'#e0e8ff',ic:'ナ',max:8,d:'移動している方向へ高速のナイフ',
@@ -60,7 +69,11 @@ const WEP={
  aura:{n:'オーラ',c:'#ff5aa0',ic:'気',max:8,d:'自分の周りの敵に継続ダメージ',
   lv:l=>`半径${60+9*l} ・ 威力${35+12*l}%`,
   tick(p,w,dt){hitCircleCD(p.x,p.y,(60+9*w.lv)*p.area,pD(p)*(.35+.12*w.lv),60,'au',.5)},
-  draw(p,w){const R=(60+9*w.lv)*p.area;ctx.globalAlpha=.13+Math.sin(G.anim*3)*.04;ctx.fillStyle='#ff5aa0';ctx.beginPath();ctx.arc(p.x,p.y,R,0,TAU);ctx.fill();ctx.globalAlpha=.45;ctx.strokeStyle='#ff8ac0';ctx.lineWidth=2;ctx.stroke();ctx.globalAlpha=1}},
+  draw(p,w){const R=(60+9*w.lv)*p.area,t=G.anim;
+   ctx.globalAlpha=.16+Math.sin(t*3)*.04;ctx.fillStyle='#ff3a8a';ctx.beginPath();ctx.arc(p.x,p.y,R,0,TAU);ctx.fill();
+   additive(true);for(let i=0;i<3;i++){const ph=(t*.8+i/3)%1;ctx.globalAlpha=.7*(1-ph);ctx.strokeStyle='#ff7ab8';ctx.lineWidth=4*(1-ph)+1;ctx.beginPath();ctx.arc(p.x,p.y,R*(.35+ph*.65),0,TAU);ctx.stroke()}
+   ctx.globalAlpha=.8;ctx.strokeStyle='#ffb0d8';ctx.lineWidth=3;ctx.beginPath();ctx.arc(p.x,p.y,R,0,TAU);ctx.stroke();
+   for(let i=0;i<8;i++){const a=t*1.5+i*TAU/8,rr=R*(.8+.2*Math.sin(t*4+i));glow(p.x+Math.cos(a)*rr,p.y+Math.sin(a)*rr,14,'#ff6aa8',.8)}additive(false);ctx.globalAlpha=1}},
  holy:{n:'聖水',c:'#5ab0ff',ic:'水',max:8,d:'敵の足元にダメージを与える水たまりを作る',
   lv:l=>`${1+Math.floor(l/3)}か所 ・ 半径${50+5*l}`,
   tick(p,w,dt){if(!cool(w,dt))return;w.t=pCD(p,Math.max(1.6,3.2-.15*w.lv));const n=1+Math.floor(w.lv/3);
@@ -71,13 +84,16 @@ const WEP={
   lv:l=>`${1+Math.floor((l-1)/2)}発 ・ 威力${160+40*l}%`,
   tick(p,w,dt){if(!cool(w,dt))return;w.t=pCD(p,Math.max(.7,1.5-.09*w.lv));const n=1+Math.floor((w.lv-1)/2),dmg=pD(p)*(1.6+.4*w.lv);
    const cs=G.en.filter(e=>!e.dead&&d2(p.x,p.y,e.x,e.y)<520*520);
-   for(let i=0;i<n&&cs.length;i++){const e=cs.splice(Math.floor(Math.random()*cs.length),1)[0];hitCircle(e.x,e.y,40*p.area,dmg,60);G.fx.push({k:'bolt',x:e.x,y:e.y,life:.25,max:.25});spawnPt(e.x,e.y,'#ffdd44',6,.5)}}},
+   for(let i=0;i<n&&cs.length;i++){const e=cs.splice(Math.floor(Math.random()*cs.length),1)[0];hitCircle(e.x,e.y,62*p.area,dmg,90);G.fx.push({k:'bolt',x:e.x,y:e.y,life:.3,max:.3});ringFx(e.x,e.y,90*p.area,'#ffe45a',.35,6);sparks(e.x,e.y,'#fff3a0',10);spawnPt(e.x,e.y,'#ffdd44',8,.7);G.shake=Math.min(8,G.shake+2)}}},
  orb:{n:'ホーリーオーブ',c:'#b06aff',ic:'珠',max:8,d:'大きな円を描いて回る光の玉',
   lv:l=>`${1+Math.floor((l-1)/2)}個 ・ 威力${100+30*l}%`,
   tick(p,w,dt){w.a+=dt*2.3;const n=1+Math.floor((w.lv-1)/2),R=(125+5*w.lv)*p.area,dmg=pD(p)*(1+.3*w.lv);
    for(let i=0;i<n;i++){const a=w.a+i/n*TAU;hitCircleCD(p.x+Math.cos(a)*R,p.y+Math.sin(a)*R,16*p.area,dmg,150,'ob',.45)}},
-  draw(p,w){const n=1+Math.floor((w.lv-1)/2),R=(125+5*w.lv)*p.area;for(let i=0;i<n;i++){const a=w.a+i/n*TAU,x=p.x+Math.cos(a)*R,y=p.y+Math.sin(a)*R;
-   ctx.fillStyle='#b06aff50';ctx.beginPath();ctx.arc(x,y,20*p.area,0,TAU);ctx.fill();ctx.fillStyle='#d8b0ff';ctx.beginPath();ctx.arc(x,y,11*p.area,0,TAU);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x,y,5*p.area,0,TAU);ctx.fill()}}},
+  draw(p,w){const n=1+Math.floor((w.lv-1)/2),R=(125+5*w.lv)*p.area;additive(true);
+   for(let i=0;i<n;i++){const a=w.a+i/n*TAU,x=p.x+Math.cos(a)*R,y=p.y+Math.sin(a)*R;
+    for(let k=1;k<=8;k++){const a2=a-k*.075;glow(p.x+Math.cos(a2)*R,p.y+Math.sin(a2)*R,(24-k*2)*p.area,'#9a5aff',.5-k*.05)}
+    glow(x,y,46*p.area,'#b06aff',.8);ctx.globalAlpha=1;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(x,y,9*p.area,0,TAU);ctx.fill()}
+   additive(false);ctx.globalAlpha=1}},
  missile:{n:'ミサイル',c:'#5aff8a',ic:'弾',max:8,d:'敵を追いかけるミサイル',
   lv:l=>`${1+Math.floor((l-1)/2)}発 ・ 威力${130+35*l}%`,
   tick(p,w,dt){if(!cool(w,dt))return;w.t=pCD(p,Math.max(.6,1.35-.08*w.lv));const n=1+Math.floor((w.lv-1)/2);

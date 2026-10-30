@@ -15,8 +15,8 @@ function showStages(){
 }
 
 function drawMini(cvs,ch){
- const g=cvs.getContext('2d'),s=SPR['h_'+ch.sty],img=sprCanvas('h_'+ch.sty,ch.pal,false),sc=Math.floor(Math.min(cvs.width/s.w,cvs.height/s.h)*.85);
- g.imageSmoothingEnabled=false;g.clearRect(0,0,cvs.width,cvs.height);g.drawImage(img,(cvs.width-s.w*sc)/2,(cvs.height-s.h*sc)/2,s.w*sc,s.h*sc);
+ const g=cvs.getContext('2d'),s=SPRITES['c_'+ch.id],img=s.frames[0],sc=Math.max(1,Math.floor(Math.min(cvs.width/s.w,cvs.height/s.h)*.9));
+ g.imageSmoothingEnabled=false;g.clearRect(0,0,cvs.width,cvs.height);g.drawImage(img,Math.round((cvs.width-s.w*sc)/2),Math.round((cvs.height-s.h*sc)/2),s.w*sc,s.h*sc);
 }
 
 function showChar(si){

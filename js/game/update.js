@@ -9,7 +9,7 @@ function startStage(si,cid){
  G.p={cid,ch,x:0,y:0,r:16,hp:maxHp,maxHp,sp:ch.sp*(1+permV('speed')),dmg:ch.dmg*(1+permV('damage')),
   cdMul:1-Math.min(.4,permV('cooldown')),area:1,pr:95*(1+permV('magnet')),greed:1+permV('greed'),armor:0,regen:0,sgMul:1,
   level:1,xp:0,xpNext:xpNeed(1),inv:1.5,hf:0,star:0,sg:0,skill:null,face:1,dirx:1,diry:0,ang:0,moving:false,
-  weapons:[{id:ch.wep,lv:1,t:0,a:0}]};
+  weapons:[{id:ch.wep,lv:1,t:0,a:0}],pl:{}};
  S.lastChar=cid;saveNow();
  ST='playing';ui.innerHTML='';hud.classList.add('on');updateSkillBtn(true);LMT=performance.now();
  showBanner(`STAGE ${si+1}  ${G.stage.n}`,'#cfe0ff');
@@ -18,13 +18,13 @@ function startStage(si,cid){
 function update(dt){
  const p=G.p;if(!p)return;
  G.t+=dt;G.anim+=dt;
- G.shake=Math.max(0,G.shake-dt*30);G.flash=Math.max(0,G.flash-dt);G.freeze=Math.max(0,G.freeze-dt);
+ G.shake=Math.max(0,G.shake-dt*30);G.flash=Math.max(0,G.flash-dt);G.rf=Math.max(0,(G.rf||0)-dt);G.freeze=Math.max(0,G.freeze-dt);
  updatePlayer(dt);
  for(const w of p.weapons)WEP[w.id].tick(p,w,dt);
  updateSkill(p,dt);
  updateSpawn(dt);updateEnemies(dt);updateProj(dt);updateEProj(dt);updateZones(dt);updateOrbs(dt);updateItems(dt);
  for(const f of G.fx)f.life-=dt;G.fx=G.fx.filter(f=>f.life>0);
- for(const q of G.pt){q.life-=dt;q.x+=q.vx*dt;q.y+=q.vy*dt;q.vx*=.92;q.vy*=.92}G.pt=G.pt.filter(q=>q.life>0);
+ for(const q of G.pt){q.life-=dt;q.x+=q.vx*dt;q.y+=q.vy*dt;q.vx*=q.fr;q.vy*=q.fr;q.vy+=q.grav*dt}G.pt=G.pt.filter(q=>q.life>0);
  for(const n of G.dn){n.life-=dt;n.y-=40*dt}G.dn=G.dn.filter(n=>n.life>0);
  if(G.pend>0){G.pend-=dt;if(G.pend<=0){finishRun(true);return}}
  if(p.hp<=0){p.hp=0;finishRun(false);return}
@@ -62,6 +62,7 @@ function updateProj(dt){
    if(d<30){b.dead=true;continue}
   }
   b.x+=b.vx*dt;b.y+=b.vy*dt;
+  if(b.kind!=='pellet'){const tr=b.tr||(b.tr=[]);tr.push(b.x,b.y);if(tr.length>(b.kind==='knife'?10:16))tr.splice(0,2)}
   if(b.life<=0){b.dead=true;continue}
   for(const e of G.en){
    if(e.dead||b.hit.has(e.id))continue;const rr=e.r+b.r;

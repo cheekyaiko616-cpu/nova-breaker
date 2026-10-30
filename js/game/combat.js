@@ -2,12 +2,11 @@
 function nearestE(x,y,maxD){let best=null,bd=maxD?maxD*maxD:Infinity;for(const e of G.en){if(e.dead)continue;const d=d2(x,y,e.x,e.y);if(d<bd){bd=d;best=e}}return best}
 function nearestWhere(x,y,maxD,f){let best=null,bd=maxD*maxD;for(const e of G.en){if(e.dead||!f(e))continue;const d=d2(x,y,e.x,e.y);if(d<bd){bd=d;best=e}}return best}
 function onScreen(e,m){m=m||0;return Math.abs(e.x-G.p.x)<W/2+m&&Math.abs(e.y-G.p.y)<H/2+m}
-function spawnPt(x,y,col,n,sp){if(G.pt.length>300)return;for(let i=0;i<n;i++){const a=Math.random()*TAU,s=rand(40,200)*sp;G.pt.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:rand(.2,.5),r:rand(2,4),c:col})}}
 function addDn(x,y,v,col){if(G.dn.length>45)return;G.dn.push({x:x+rand(-8,8),y:y-10,v:typeof v==='number'?Math.round(v):v,life:.7,c:col||'#fff'})}
 
 // 自分の弾
 function addP(o){
- const b={x:o.x,y:o.y,vx:o.vx!=null?o.vx:Math.cos(o.a)*o.sp,vy:o.vy!=null?o.vy:Math.sin(o.a)*o.sp,r:o.r,dmg:o.dmg,pi:o.pi||0,col:o.col,kind:o.kind,life:o.life||2,kb:o.kb||0,grav:o.grav||0,hit:new Set(),t:0,dead:false};
+ const b={x:o.x,y:o.y,vx:o.vx!=null?o.vx:Math.cos(o.a)*o.sp,vy:o.vy!=null?o.vy:Math.sin(o.a)*o.sp,r:o.r,dmg:o.dmg,pi:(o.pi||0)+(G.evoNow?4:0),col:o.col,kind:o.kind,life:o.life||2,kb:o.kb||0,grav:o.grav||0,hit:new Set(),t:0,dead:false};
  G.pr.push(b);return b;
 }
 
@@ -24,14 +23,14 @@ function beam(x,y,a,len,wid,dmg,col,noFx){
 // 敵へのダメージ
 function dmgE(e,dmg,kb,sx,sy){
  if(e.dead)return;
- e.hp-=dmg;e.flash=.08;
+ e.hp-=dmg;e.flash=.08;hitFx(e,dmg,sx!=null?sx:G.p.x,sy!=null?sy:G.p.y);
  addDn(e.x,e.y-e.r,dmg,dmg>=G.p.dmg*4?'#ffd84a':'#ffffff');
  if(kb&&!e.boss){const res=e.t.kbRes||0;if(res<1){const ox=sx!=null?sx:G.p.x,oy=sy!=null?sy:G.p.y,dx=e.x-ox,dy=e.y-oy,d=Math.hypot(dx,dy)||1,f=kb*(1-res)*(e.giant||e.mid?.3:1);e.kx+=dx/d*f;e.ky+=dy/d*f}}
  if(e.hp<=0)killE(e);
 }
 function killE(e,noDrop){
  if(e.dead)return;e.dead=true;
- spawnPt(e.x,e.y,e.pal.a||e.pal.t||'#fff',e.boss?60:8,e.boss?1.2:.6);
+ deathFx(e);
  if(noDrop)return;
  G.kills++;
  const p=G.p;
@@ -53,7 +52,7 @@ function killE(e,noDrop){
 // 自分へのダメージ
 function hurtP(dmg){
  const p=G.p;if(p.inv>0||p.star>0||isSkill(p,'whirl')||isSkill(p,'sanct'))return;
- const v=Math.max(1,dmg-p.armor);p.hp-=v;p.inv=.6;p.hf=.2;G.shake=Math.min(14,G.shake+6);
+ const v=Math.max(1,dmg-p.armor);p.hp-=v;p.inv=.6;p.hf=.2;G.rf=.35;G.shake=Math.min(14,G.shake+6);
  spawnPt(p.x,p.y,'#ff5566',8,.5);addDn(p.x,p.y-34,v,'#ff5a6a');
 }
 
@@ -81,7 +80,9 @@ function applyItem(k){
  addDn(p.x,p.y-56,ITEMS[k].n,'#ffe08a');
 }
 function openChest(){
- const p=G.p,n=chance(.15)?3:1,got=[];
+ const p=G.p;const ev=p.weapons.find(w=>canEvolve(p,w));
+ if(ev){evolveWeapon(p,ev);G.goldRun+=30+G.si*10;return}
+ const n=chance(.15)?3:1,got=[];
  for(let i=0;i<n;i++){const c=p.weapons.filter(w=>w.lv<WEP[w.id].max);if(!c.length)break;const w=pick(c);w.lv++;got.push(`${WEP[w.id].n} Lv${w.lv}`)}
  const g=20+G.si*10;G.goldRun+=g;
  if(!got.length)p.hp=Math.min(p.maxHp,p.hp+p.maxHp*.3);

@@ -12,7 +12,7 @@ function makeEnemy(type,x,y,o){
  else if(o.elite){e.elite=true;hp*=4;size*=1.35;dmg*=1.25;xp*=4;sp*=1.05}
  if(e.ai==='straight'){e.vx=o.vx;e.vy=o.vy;e.life=o.life||10}
  e.hp=e.maxHp=hp;e.sc=size;e.dmg=dmg;e.xp=xp;e.sp=sp;
- const s=SPR[t.spr];e.r=Math.max(s.w,s.h)*size*.34;
+ const s=SPRITES[t.spr];e.k=t.oh*1.15/s.h;e.r=Math.max(s.w*.8,s.h)*size*e.k*.34;
  G.en.push(e);return e;
 }
 function pickType(){
@@ -34,12 +34,12 @@ function updateSpawn(dt){
  while(G.evIdx<stg.events.length&&G.t>=stg.events[G.evIdx][0]){runEvent(stg.events[G.evIdx]);G.evIdx++}
  if(!G.midSpawned&&G.t>=stg.dur*.5){G.midSpawned=true;const[x,y]=spawnPos();makeEnemy(stg.pool[stg.pool.length-1][1],x,y,{mid:true});showBanner('強敵出現！','#ff8a5a')}
  if(!G.bossSpawned&&G.t>=stg.dur)spawnBoss();
- let target=Math.min(110,10+prog*(60+G.si*8));if(G.boss)target*=.45;
+ let target=Math.min(150,26+prog*(78+G.si*9));if(G.boss)target*=.45;
  G.spawnT-=dt;
  if(G.spawnT<=0){
-  G.spawnT=Math.max(.1,.55-prog*(.35+G.si*.03));
+  G.spawnT=Math.max(.08,.4-prog*(.28+G.si*.02));
   const alive=G.en.length;
-  if(alive<target){const n=alive<target*.5?4:1+Math.floor(prog*2);for(let i=0;i<n;i++)spawnOne()}
+  if(alive<target){const n=alive<target*.5?5:2+Math.floor(prog*2);for(let i=0;i<n;i++)spawnOne()}
  }
 }
 function runEvent(ev){

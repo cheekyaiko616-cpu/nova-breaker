@@ -1,3 +1,5 @@
+// 動作エラーを画面に出す（原因調べ用）
+window.addEventListener('error',e=>{let d=document.getElementById('errbox');if(!d){d=document.createElement('div');d.id='errbox';d.style.cssText='position:fixed;left:0;right:0;top:0;z-index:99999;background:#400;color:#fff;font:12px/1.4 monospace;padding:6px;white-space:pre-wrap;max-height:50vh;overflow:auto';document.body.appendChild(d)}d.textContent+=(e.message||'')+' @'+(e.filename||'').split('/').pop()+':'+e.lineno+'\n'});
 "use strict";
 // ===== 基本設定・共通関数・セーブデータ =====
 const W=1280,H=720,TAU=Math.PI*2;
