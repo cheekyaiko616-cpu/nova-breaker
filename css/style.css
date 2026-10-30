@@ -1,0 +1,82 @@
+/* ===== 画面全体 ===== */
+html,body{touch-action:none;overscroll-behavior:none;margin:0;height:100%;overflow:hidden;background:#04060c;font-family:system-ui,-apple-system,sans-serif;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+body{display:flex;align-items:center;justify-content:center;position:fixed;inset:0}
+#w{position:relative;width:min(100vw,calc(100vh*16/9));width:min(100vw,calc(100dvh*16/9));aspect-ratio:16/9;container-type:inline-size;overflow:hidden}
+canvas{width:100%;height:100%;display:block;image-rendering:pixelated}
+#ui{position:absolute;inset:0;pointer-events:none}
+#ui>*{pointer-events:auto}
+button{font-family:inherit}
+
+/* ===== プレイ中のボタン ===== */
+#hud{position:absolute;inset:0;pointer-events:none;display:none}
+#hud.on{display:block}
+#pauseBtn{position:absolute;top:2.6cqw;right:1.2cqw;width:5.4cqw;height:5.4cqw;border-radius:1cqw;border:2px solid #ffffff50;background:#00000070;color:#fff;font-weight:900;font-size:2cqw;pointer-events:auto;padding:0}
+#skillBtn{position:absolute;right:1.6cqw;bottom:1.6cqw;width:12.5cqw;height:12.5cqw;border-radius:50%;border:none;pointer-events:auto;padding:0;background:conic-gradient(var(--sc,#7fd1ff) calc(var(--g,0)*1%),#ffffff1c 0);display:flex;align-items:center;justify-content:center}
+#skillBtn span{width:84%;height:84%;border-radius:50%;background:#0a0e1ae6;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:1.9cqw;font-weight:900;line-height:1.15;text-align:center}
+#skillBtn small{font-size:1.15cqw;font-weight:700;color:#cfe0ff}
+#skillBtn.ready{animation:pulse .7s infinite alternate}
+#skillBtn.ready span{background:radial-gradient(circle,#ffffff38,#0a0e1ae6 70%)}
+@keyframes pulse{from{box-shadow:0 0 .8cqw var(--sc)}to{box-shadow:0 0 4cqw var(--sc)}}
+
+/* ===== 共通の画面パーツ ===== */
+.s{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1.3cqw;padding:2cqw;box-sizing:border-box;color:#e8eaf6;font-size:1.8cqw;background:radial-gradient(circle,#121830f2,#03050cf8);text-align:center;overflow-y:auto}
+h1{font-size:6.4cqw;margin:0;background:linear-gradient(180deg,#bcd8ff,#4a6ae0);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:900;letter-spacing:.1em}
+h1.d{background:linear-gradient(180deg,#ffb0b8,#ff2050);-webkit-background-clip:text;background-clip:text}
+h1.c{background:linear-gradient(180deg,#fff2b0,#ffb020);-webkit-background-clip:text;background-clip:text}
+h2{font-size:3.2cqw;margin:0;color:#c0d0ff;letter-spacing:.05em}
+.sub{color:#8a9ac0;font-size:1.6cqw}
+.btn{font-size:2.2cqw;font-weight:800;padding:1.1cqw 3.2cqw;background:linear-gradient(180deg,#2a3a6a,#182240);color:#e8eaf6;border:2px solid #4a5a9a;border-radius:.7cqw;cursor:pointer}
+.btn:disabled{opacity:.4}
+.btn.g{background:linear-gradient(180deg,#6a5220,#3a2c10);border-color:#a0842a}
+.btn.big{font-size:2.8cqw;padding:1.3cqw 5cqw;background:linear-gradient(180deg,#3a6ad8,#1a3a8a);border-color:#8ab0ff}
+.row{display:flex;gap:1.4cqw;flex-wrap:wrap;justify-content:center}
+.gold{font-size:2.6cqw;font-weight:900;color:#ffc84a}
+
+/* ===== レベルアップ ===== */
+.cards{display:flex;gap:1.4cqw;flex-wrap:wrap;justify-content:center;max-width:96cqw}
+.card{width:25cqw;padding:1.4cqw;background:#ffffff12;border:2px solid var(--c);border-radius:.9cqw;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:.5cqw}
+.cr{font-size:1.3cqw;color:var(--c);font-weight:800;letter-spacing:.1em}
+.ci{width:6cqw;height:6cqw;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:2.8cqw;font-weight:900;background:#ffffff10;border:2px solid var(--c);color:var(--c)}
+.cn{font-size:2.1cqw;font-weight:800}
+.cd{font-size:1.6cqw;color:#c0c8e0}
+
+/* ===== ステージ選択 ===== */
+.sg{display:grid;grid-template-columns:repeat(3,1fr);gap:1.2cqw;width:90cqw}
+.st{padding:1.3cqw 1.5cqw;border-radius:.9cqw;border:2px solid var(--c);background:linear-gradient(160deg,var(--b),#0a0e1a);text-align:left;cursor:pointer;display:flex;flex-direction:column;gap:.35cqw;min-height:11cqw;box-sizing:border-box}
+.st.l{opacity:.35;filter:grayscale(1)}
+.stn{font-size:2.3cqw;font-weight:900}
+.sts{font-size:1.4cqw;color:#b8c0d8}
+.stc{font-size:1.5cqw;color:#ffd84a;font-weight:800}
+
+/* ===== キャラ選択 ===== */
+.cs{display:flex;gap:1.6cqw;align-items:stretch;width:94cqw}
+.cl{display:grid;grid-template-columns:repeat(3,1fr);gap:1cqw;flex:1}
+.cc{padding:.6cqw;background:#ffffff0a;border:2px solid #ffffff22;border-radius:.7cqw;display:flex;flex-direction:column;align-items:center;cursor:pointer}
+.cc.sel{border-color:var(--c);background:#ffffff1e}
+.cc.l{opacity:.3}
+.cp{width:9cqw;height:9cqw}
+.ccn{font-size:1.9cqw;font-weight:800;color:var(--c)}
+.cct{font-size:1.3cqw;color:#9aa4c0}
+.cdp{flex:1.05;padding:1.6cqw;border:2px solid var(--c);border-radius:.9cqw;background:#0a0e1acc;text-align:left;display:flex;flex-direction:column;gap:.8cqw;font-size:1.7cqw;box-sizing:border-box}
+.cdp h3{margin:0;font-size:3cqw;color:var(--c)}
+.tag{display:inline-block;padding:.25cqw .9cqw;border-radius:.5cqw;background:#ffffff1a;font-size:1.45cqw;margin:0 .4cqw .4cqw 0}
+.kv{color:#8a9ac0;font-size:1.4cqw}
+.sk{color:#ffe08a;font-weight:800}
+
+/* ===== リザルト・ガチャ ===== */
+.stats{display:flex;gap:3cqw;font-size:2.2cqw;flex-wrap:wrap;justify-content:center}
+.stats>div{display:flex;flex-direction:column;gap:.3cqw}
+.stats span:first-child{font-size:1.4cqw;color:#7a8ab0}
+.stats span:last-child{font-weight:900;color:#ffc84a}
+.gr{display:flex;gap:.8cqw;flex-wrap:wrap;justify-content:center;min-height:9cqw;max-width:92cqw}
+.gc{width:18cqw;padding:.9cqw;background:#ffffff10;border:2px solid var(--c);border-radius:.6cqw;display:flex;flex-direction:column;align-items:center;gap:.3cqw}
+.gcn{font-size:1.4cqw;font-weight:800;color:var(--c)}
+.gct{font-size:1.7cqw;color:#d8e0f0}
+.wl{display:flex;gap:.8cqw;flex-wrap:wrap;justify-content:center;max-width:90cqw}
+.wl span{padding:.4cqw 1cqw;border-radius:.5cqw;border:1px solid var(--c);color:var(--c);font-size:1.5cqw;font-weight:700}
+
+/* ===== 演出 ===== */
+#banner{position:absolute;top:19%;left:0;right:0;text-align:center;font-size:3.6cqw;font-weight:900;color:#fff;text-shadow:0 0 1.5cqw #000,0 0 3cqw currentColor;pointer-events:none;opacity:0;transition:opacity .3s;padding:0 4cqw}
+#banner.show{opacity:1}
+#stk{position:fixed;left:0;top:0;width:110px;height:110px;margin:-55px 0 0 -55px;border-radius:50%;border:2px solid #7fd1ff80;background:#7fd1ff14;pointer-events:none;display:none;z-index:9}
+#stk i{position:absolute;left:50%;top:50%;width:48px;height:48px;margin:-24px 0 0 -24px;border-radius:50%;background:#7fd1ff80;border:2px solid #cfeaff}
